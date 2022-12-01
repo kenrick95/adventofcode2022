@@ -17,3 +17,7 @@
 
 # Go workspace file
 go.work
+
+# AOC
+*.in
+*.out
