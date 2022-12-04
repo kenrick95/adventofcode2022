@@ -1,17 +1,12 @@
 package main
 
 import (
-	"log"
-	"os"
 	"strings"
+	"utils"
 )
 
 func main() {
-	content, err := os.ReadFile("day03.in")
-	if err != nil {
-		log.Fatal(err)
-	}
-	var lines []string = strings.Split(string(content), "\n")
+	var lines = utils.ReadFileToLines("day03.in")
 
 	// Part 1
 	var totalPriorities = 0
