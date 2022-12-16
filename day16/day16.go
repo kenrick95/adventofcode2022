@@ -94,23 +94,30 @@ func main() {
 		for _, nodeDest := range node.destinations {
 			// Go and do nothing
 			if timeLeft >= 1 {
-				maxReturn = max(maxReturn, traverse(nodeDest.name, openedNodes, timeLeft-1))
+
+				if !visitedMap[openedNodes][nodeDest.name] {
+					visitedMap[openedNodes][nodeDest.name] = true
+					maxReturn = max(maxReturn, traverse(nodeDest.name, openedNodes, timeLeft-1))
+					visitedMap[openedNodes][nodeDest.name] = false
+				}
 			}
 
 			// Go and open tap
 			// Makes sense only when it has positive flow rate
 			if timeLeft >= 2 && nodeDest.flowRate > 0 {
 				mask := 1 << nodeNameMapToIndex[nodeDest.name]
-				newOpenedNodes := openedNodes | mask
+				if openedNodes&mask == 0 {
+					newOpenedNodes := openedNodes | mask
 
-				_, visExist := visitedMap[newOpenedNodes]
-				if !visExist {
-					visitedMap[newOpenedNodes] = map[string]bool{}
-				}
-				if !visitedMap[newOpenedNodes][nodeDest.name] {
-					visitedMap[newOpenedNodes][nodeDest.name] = true
-					maxReturn = max(maxReturn, traverse(nodeDest.name, openedNodes|mask, timeLeft-2)+(timeLeft-2)*nodeDest.flowRate)
-					visitedMap[newOpenedNodes][nodeDest.name] = false
+					_, visExist := visitedMap[newOpenedNodes]
+					if !visExist {
+						visitedMap[newOpenedNodes] = map[string]bool{}
+					}
+					if !visitedMap[newOpenedNodes][nodeDest.name] {
+						visitedMap[newOpenedNodes][nodeDest.name] = true
+						maxReturn = max(maxReturn, traverse(nodeDest.name, openedNodes|mask, timeLeft-2)+(timeLeft-2)*nodeDest.flowRate)
+						visitedMap[newOpenedNodes][nodeDest.name] = false
+					}
 				}
 			}
 		}
