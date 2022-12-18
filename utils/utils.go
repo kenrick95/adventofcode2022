@@ -19,3 +19,22 @@ func ReadFileToLines(filename string) []string {
 	}
 	return cleanLines
 }
+
+func Abs(num int) int {
+	if num < 0 {
+		return -num
+	}
+	return num
+}
+func Min(one int, two int) int {
+	if one < two {
+		return one
+	}
+	return two
+}
+func Max(one int, two int) int {
+	if one > two {
+		return one
+	}
+	return two
+}
