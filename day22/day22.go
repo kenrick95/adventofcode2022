@@ -148,6 +148,44 @@ func main() {
 		}
 	}
 
+	quadrants := map[Coord]int{}
+
+	{
+		qCount := 50
+		// Not proud of this hardcoding
+		for y := 0; y < qCount; y++ {
+			for x := 50; x < 50+qCount; x++ {
+				quadrants[Coord{x, y}] = 1
+			}
+		}
+		for y := 0; y < qCount; y++ {
+			for x := 100; x < 100+qCount; x++ {
+				quadrants[Coord{x, y}] = 2
+			}
+		}
+		for y := 50; y < 50+qCount; y++ {
+			for x := 50; x < 50+qCount; x++ {
+				quadrants[Coord{x, y}] = 3
+			}
+		}
+
+		for y := 100; y < 100+qCount; y++ {
+			for x := 0; x < 0+qCount; x++ {
+				quadrants[Coord{x, y}] = 5
+			}
+		}
+		for y := 100; y < 100+qCount; y++ {
+			for x := 50; x < 50+qCount; x++ {
+				quadrants[Coord{x, y}] = 6
+			}
+		}
+		for y := 150; y < 150+qCount; y++ {
+			for x := 0; x < 0+qCount; x++ {
+				quadrants[Coord{x, y}] = 4
+			}
+		}
+	}
+
 	fmt.Printf("commands: %v\n", commands)
 	fmt.Printf("startingCoord: %v\n", startingCoord)
 
@@ -188,21 +226,21 @@ func main() {
 		currentState := initialState
 		for _, cmd := range commands {
 
-			// fmt.Printf("cmd: %v %v\n", i, cmd)
-			// fmt.Printf("currentState: %v\n", currentState)
+			fmt.Printf("cmd: %v\n", cmd)
 
 			for count := 0; count < cmd.amount; count++ {
+				fmt.Printf("currentState: %v\n", currentState)
 				currentDelta := deltas[currentState.direction]
 				nextCoord := Coord{
 					x: currentState.coord.x + currentDelta.x,
 					y: currentState.coord.y + currentDelta.y,
 				}
 				nextDirection := currentState.direction
-				// fmt.Printf("nextCoord: %v\n", nextCoord)
+				fmt.Printf("nextCoord: %v\n", nextCoord)
 
 				nextCell, _ := areaMap[nextCoord]
 
-				// fmt.Printf("nextCell: %v\n", nextCell)
+				fmt.Printf("nextCell: %v\n", nextCell)
 
 				if nextCell.content == Offside {
 					// wrap~
@@ -225,17 +263,174 @@ func main() {
 						}
 					} else {
 						// Part 2 logic
-						// TODO: Hmmm quite hard
+						// TODO: Hmmm extremely dirty and complicated and bug-prone (dead)
+						currentQ := quadrants[currentState.coord]
+						nextQ := 0
+						fmt.Printf("wrapping currentQ: %v\n", currentQ)
+
+						switch currentQ {
+						case 1:
+							{
+								if currentState.direction == DirDown {
+									nextQ = 3
+								} else if currentState.direction == DirUp {
+									nextQ = 4
+									nextDirection = DirRight
+									nextCoord = Coord{
+										x: 0,
+										y: currentState.coord.x - 50 + 150,
+									}
+								} else if currentState.direction == DirRight {
+									nextQ = 2
+								} else if currentState.direction == DirLeft {
+									nextQ = 5
+									nextDirection = DirRight
+									nextCoord = Coord{
+										x: 0,
+										y: -currentState.coord.y + 149,
+									}
+								}
+							}
+						case 2:
+							{
+								if currentState.direction == DirDown {
+									nextQ = 3
+									nextDirection = DirLeft
+									nextCoord = Coord{
+										x: 99,
+										y: currentState.coord.x - 100 + 50,
+									}
+								} else if currentState.direction == DirUp {
+									nextQ = 4
+									nextDirection = DirUp
+									nextCoord = Coord{
+										x: currentState.coord.x - 100,
+										y: 199,
+									}
+								} else if currentState.direction == DirRight {
+									nextQ = 6
+									nextDirection = DirLeft
+									nextCoord = Coord{
+										x: 99,
+										y: -currentState.coord.y + 149,
+									}
+								} else if currentState.direction == DirLeft {
+									nextQ = 1
+								}
+							}
+						case 3:
+							{
+								if currentState.direction == DirDown {
+									nextQ = 6
+								} else if currentState.direction == DirUp {
+									nextQ = 1
+								} else if currentState.direction == DirRight {
+									nextQ = 2
+									nextDirection = DirUp
+									nextCoord = Coord{
+										x: currentState.coord.y - 50 + 100,
+										y: 49,
+									}
+								} else if currentState.direction == DirLeft {
+									nextQ = 5
+									nextDirection = DirDown
+									nextCoord = Coord{
+										x: currentState.coord.y - 50,
+										y: 100,
+									}
+								}
+							}
+
+						case 4:
+							{
+								if currentState.direction == DirDown {
+									nextQ = 2
+									nextDirection = DirDown
+									nextCoord = Coord{
+										x: currentState.coord.x + 100,
+										y: 0,
+									}
+								} else if currentState.direction == DirUp {
+									nextQ = 5
+								} else if currentState.direction == DirRight {
+									nextQ = 6
+									nextDirection = DirUp
+									nextCoord = Coord{
+										x: currentState.coord.y - 150 + 50,
+										y: 149,
+									}
+								} else if currentState.direction == DirLeft {
+									nextQ = 1
+									nextDirection = DirDown
+									nextCoord = Coord{
+										x: currentState.coord.y - 150 + 50,
+										y: 0,
+									}
+								}
+							}
+
+						case 5:
+							{
+								if currentState.direction == DirDown {
+									nextQ = 4
+								} else if currentState.direction == DirUp {
+									nextQ = 3
+									nextDirection = DirRight
+									nextCoord = Coord{
+										x: 50,
+										y: currentState.coord.x + 50,
+									}
+								} else if currentState.direction == DirRight {
+									nextQ = 6
+								} else if currentState.direction == DirLeft {
+									nextQ = 1
+									nextDirection = DirRight
+									nextCoord = Coord{
+										x: 50,
+										y: -(currentState.coord.y - 100) + 49,
+									}
+								}
+							}
+
+						case 6:
+							{
+								if currentState.direction == DirDown {
+									nextQ = 4
+									nextDirection = DirLeft
+									nextCoord = Coord{
+										x: 49,
+										y: currentState.coord.x - 50 + 150,
+									}
+								} else if currentState.direction == DirUp {
+									nextQ = 3
+								} else if currentState.direction == DirRight {
+									nextQ = 2
+									nextDirection = DirLeft
+									nextCoord = Coord{
+										x: 149,
+										y: -(currentState.coord.y - 100) + 49,
+									}
+								} else if currentState.direction == DirLeft {
+									nextQ = 5
+								}
+							}
+						}
+
+						fmt.Printf("nextQ: %v\n", nextQ)
+
 					}
 
-					// fmt.Printf("nextCoord (wrapped): %v\n", nextCoord)
+					fmt.Printf("nextCoord (wrapped): %v\n", nextCoord)
+					fmt.Printf("nextDirection (wrapped): %v\n", nextDirection)
 					nextCell, _ = areaMap[nextCoord]
-					// fmt.Printf("nextCell (wrapped): %v\n", nextCell)
+					fmt.Printf("nextCell (wrapped): %v\n", nextCell)
 				}
 
 				if nextCell.content == SolidWall {
+					fmt.Printf("Hit wall, breaking\n")
 					break
 				} else {
+					fmt.Printf("OK\n")
 					currentState.coord = nextCoord
 					currentState.direction = nextDirection
 				}
@@ -253,8 +448,16 @@ func main() {
 	}
 
 	// Part 1
-	fmt.Printf("ansPart1: %v\n", walk(State{
+	// fmt.Printf("ansPart1: %v\n", walk(State{
+	// 	coord:     startingCoord,
+	// 	direction: DirRight,
+	// }, false))
+
+	// Part 2
+	// That's not the right answer; your answer is too high.  (You guessed 169153.)
+	// That's not the right answer; your answer is too high.  (You guessed 124314.)
+	fmt.Printf("ansPart2: %v\n", walk(State{
 		coord:     startingCoord,
 		direction: DirRight,
-	}))
+	}, true))
 }
