@@ -7,17 +7,22 @@ import (
 )
 
 func ReadFileToLines(filename string) []string {
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var lines []string = strings.Split(string(content), "\n")
+	var lines []string = ReadFileToLinesNoTrim(filename)
 	var cleanLines []string
 	for _, line := range lines {
 		var cleanedLine string = strings.TrimSpace(line)
 		cleanLines = append(cleanLines, cleanedLine)
 	}
 	return cleanLines
+}
+func ReadFileToLinesNoTrim(filename string) []string {
+
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var lines []string = strings.Split(string(content), "\n")
+	return lines
 }
 
 func Abs(num int) int {
